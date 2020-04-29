@@ -1,0 +1,5 @@
+rootProject.name='GradleNew'
+include ':apps:app',':apps:appb',':apps:appa'
+include ':libraryA'
+include ':libraryb'
+include ':libraryc'

@@ -1,0 +1,78 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext.kotlin_version = '1.3.70'
+    repositories {
+        google()
+        jcenter()
+
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+task cleanCache(type: Delete) {
+    delete rootProject.getRootDir().getAbsolutePath() + "/outputs"
+    def appsChildProject = project.getChildProjects().get('apps').getAllprojects()
+    for (apps in appsChildProject) {
+        if (apps.name != "apps") {
+            println "----->>" + apps.getProjectDir().getAbsolutePath() + "/build"
+            delete apps.getProjectDir().getAbsolutePath() + "/build"
+        }
+    }
+}
+
+project.tasks.whenTaskAdded { Task theTask ->
+    if (theTask.name == 'assemble') {
+        println "whenTaskAdded----->>"
+        theTask.dependsOn(cleanCache)
+        theTask.doLast {
+            assembleRAfter()
+        }
+//        theTask.finalizedBy 'assembleRAfter'
+//        theTask.dependsOn(assembleRAfter)
+    }
+}
+
+void assembleRAfter() {
+    // 这里获取到assembleRelease和assembleDebug的task任务
+    //注意这里使用tasks.getByName("assembleRelease")会报错，找不到这个task
+    println "assembleRAfter file -------------------"
+    def childProjects = project.getChildProjects()
+    def appsProject = childProjects.get("apps")
+    def appsChildProject = appsProject.getAllprojects()
+    for (apps in appsChildProject) {
+        if (apps.name != "apps") {
+            def dir = apps.getProjectDir().getAbsolutePath()
+
+            def file = new File(dir + "/build/outputs/apk/release")
+
+            if (file.exists()) {
+                //将生成的apk拷贝出来
+                copy { //copy是gradle中的project提供的方法，用于拷贝，里面有两个特定的属性
+                    //from srcDir ， into desDir （当这个目录不存在的时候会尝试创建这个文件夹）
+                    println "copyApkFile file -------------------"
+                    from dir + "/build/outputs/apk/release"
+                    into rootProject.getRootDir().getAbsolutePath() + "/outputs"
+                }
+            }
+        }
+    }
+}
