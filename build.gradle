@@ -10,6 +10,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        //aspectjtools插件
+        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.10'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -20,7 +22,7 @@ allprojects {
     repositories {
         google()
         jcenter()
-
+        mavenCentral()
     }
 }
 
@@ -51,7 +53,8 @@ project.tasks.whenTaskAdded { Task theTask ->
     }
 }
 
-void assembleRAfter() {
+
+task assembleRAfter() {
     // 这里获取到assembleRelease和assembleDebug的task任务
     //注意这里使用tasks.getByName("assembleRelease")会报错，找不到这个task
     println "assembleRAfter file -------------------"
@@ -60,19 +63,23 @@ void assembleRAfter() {
     def appsChildProject = appsProject.getAllprojects()
     for (apps in appsChildProject) {
         if (apps.name != "apps") {
-            def dir = apps.getProjectDir().getAbsolutePath()
+            copyApkFile(apps)
+        }
+    }
+}
 
-            def file = new File(dir + "/build/outputs/apk/release")
+def copyApkFile(Project project) {
+    def dir = project.getProjectDir().getAbsolutePath()
 
-            if (file.exists()) {
-                //将生成的apk拷贝出来
-                copy { //copy是gradle中的project提供的方法，用于拷贝，里面有两个特定的属性
-                    //from srcDir ， into desDir （当这个目录不存在的时候会尝试创建这个文件夹）
-                    println "copyApkFile file -------------------"
-                    from dir + "/build/outputs/apk/release"
-                    into rootProject.getRootDir().getAbsolutePath() + "/outputs"
-                }
-            }
+    def file = new File(dir + "/build/outputs/apk/release")
+    println "copyApkFile--->" + file.exists()
+    if (file.exists()) {
+        //将生成的apk拷贝出来
+        copy { //copy是gradle中的project提供的方法，用于拷贝，里面有两个特定的属性
+            //from srcDir ， into desDir （当这个目录不存在的时候会尝试创建这个文件夹）
+            println "copyApkFile file -------------------"
+            from dir + "/build/outputs/apk/release"
+            into rootProject.getRootDir().getAbsolutePath() + "/outputs"
         }
     }
 }

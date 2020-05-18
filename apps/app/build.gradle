@@ -1,11 +1,26 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+//引入aspectj插件
+apply plugin: 'android-aspectjx'
+
+apply plugin: 'GPlugin'
+
+gplugin {
+    user 'xixixi'
+}
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-
+    signingConfigs {
+        releaseKey {
+            storeFile file(rootProject.getRootDir().getAbsolutePath() + "/gn.jks")
+            storePassword "li19940403"
+            keyAlias "key0"
+            keyPassword "li19940403"
+        }
+    }
     defaultConfig {
         applicationId "com.example.gradlenew"
         minSdkVersion 16
@@ -20,7 +35,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseKey
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
 }
@@ -34,4 +55,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    compileOnly 'com.android.tools.build:gradle:3.0.1'
+
+    //引入aspectj的依赖
+    api 'org.aspectj:aspectjrt:1.9.5'
+}
+repositories {
+    mavenCentral()
 }
