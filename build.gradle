@@ -8,10 +8,10 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:4.0.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         //aspectjtools插件
-        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.10'
+//        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.10'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -30,43 +30,45 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-task cleanCache(type: Delete) {
-    delete rootProject.getRootDir().getAbsolutePath() + "/outputs"
-    def appsChildProject = project.getChildProjects().get('apps').getAllprojects()
-    for (apps in appsChildProject) {
-        if (apps.name != "apps") {
-            println "----->>" + apps.getProjectDir().getAbsolutePath() + "/build"
-            delete apps.getProjectDir().getAbsolutePath() + "/build"
-        }
-    }
-}
+//task cleanCache(type: Delete) {
+//    delete rootProject.getRootDir().getAbsolutePath() + "/outputs"
+//    def appsChildProject = project.getChildProjects().get('apps').getAllprojects()
+//    for (apps in appsChildProject) {
+//        if (apps.name != "apps") {
+//            println "----->>" + apps.getProjectDir().getAbsolutePath() + "/build"
+//            delete apps.getProjectDir().getAbsolutePath() + "/build"
+//        }
+//    }
+//}
 
-project.tasks.whenTaskAdded { Task theTask ->
-    if (theTask.name == 'assemble') {
-        println "whenTaskAdded----->>"
-        theTask.dependsOn(cleanCache)
-        theTask.doLast {
-            assembleRAfter()
-        }
-//        theTask.finalizedBy 'assembleRAfter'
-//        theTask.dependsOn(assembleRAfter)
-    }
-}
+//project.tasks.whenTaskAdded { Task theTask ->
+//    if (theTask.name == 'assemble') {
+//        println "whenTaskAdded----->>"
+//        theTask.dependsOn(cleanCache)
+//        theTask.doLast {
+//            assembleRAfter()
+//        }
+////        theTask.finalizedBy 'assembleRAfter'
+////        theTask.dependsOn(assembleRAfter)
+//    }
+//}
 
 
-task assembleRAfter() {
-    // 这里获取到assembleRelease和assembleDebug的task任务
-    //注意这里使用tasks.getByName("assembleRelease")会报错，找不到这个task
-    println "assembleRAfter file -------------------"
-    def childProjects = project.getChildProjects()
-    def appsProject = childProjects.get("apps")
-    def appsChildProject = appsProject.getAllprojects()
-    for (apps in appsChildProject) {
-        if (apps.name != "apps") {
-            copyApkFile(apps)
-        }
-    }
-}
+//task assembleRAfter() {
+//    // 这里获取到assembleRelease和assembleDebug的task任务
+//    //注意这里使用tasks.getByName("assembleRelease")会报错，找不到这个task
+//    doLast {
+//        println "assembleRAfter file -------------------"
+//        def childProjects = project.getChildProjects()
+//        def appsProject = childProjects.get("apps")
+//        def appsChildProject = appsProject.getAllprojects()
+//        for (apps in appsChildProject) {
+//            if (apps.name != "apps") {
+//                copyApkFile(apps)
+//            }
+//        }
+//    }
+//}
 
 def copyApkFile(Project project) {
     def dir = project.getProjectDir().getAbsolutePath()
@@ -83,3 +85,39 @@ def copyApkFile(Project project) {
         }
     }
 }
+
+//在每一个task运行结束之后执行，assemble这个task会在每一个模块都会执行
+gradle.taskGraph.afterTask {
+    if (it.name == "assemble") {
+        println "---->afterTask ++++++++++++++++++++${it.project.toString()}"
+        println "assembleRAfter file -------------------"
+//        def childProjects = project.getChildProjects()
+//        def appsProject = childProjects.get("apps")
+//        def appsChildProject = appsProject.getAllprojects()
+//        for (apps in appsChildProject) {
+//            if (apps.name != "apps") {
+        copyApkFile(it.project)
+//            }
+//        }
+    }
+}
+
+//在每一个task运行之前执行，assemble这个task会在每一个模块都会执行
+//gradle.taskGraph.beforeTask {
+//    if (it.name == "assemble") {
+//        println "---->beforeTask ++++++++++++++++++++${it.project.toString()}"
+//        println "---->beforeTask 000000000000000000000000-${it.project.toString() == "project ':libraryA'"}"
+//        if (it.project.toString() == "project ':libraryA'") {
+//            println "---->beforeTask ============================="
+////            cleanCache
+////           file(rootProject.getRootDir().getAbsolutePath() + "/outputs").deleteDir()
+////            def appsChildProject = project.getChildProjects().get('apps').getAllprojects()
+////            for (apps in appsChildProject) {
+////                if (apps.name != "apps") {
+////                    println "----->>" + apps.getProjectDir().getAbsolutePath() + "/build"
+////                    file(apps.getProjectDir().getAbsolutePath() + "/build").deleteDir()
+////                }
+////            }
+//        }
+//    }
+//}

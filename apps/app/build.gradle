@@ -2,12 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 //引入aspectj插件
-apply plugin: 'android-aspectjx'
+//apply plugin: 'android-aspectjx'
 
-apply plugin: 'GPlugin'
+//apply plugin: 'GPlugin'
+//
+//gplugin {
+//    user 'xixixi'
+//}
 
-gplugin {
-    user 'xixixi'
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyy-MM-dd-HH-mm')
+    return formattedDate
 }
 
 android {
@@ -36,6 +42,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.releaseKey
+//            android.applicationVariants.all { variant ->
+//                variant.outputs.all { output ->
+//                    def outputFile = output.outputFile
+//                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                        // 输出apk名称为boohee_v1.0_2015-01-15.apk
+//                        def fileName = "runHome_v${defaultConfig.versionName}_${getDate()}.apk"
+//                        outputFileName = "../release/" + fileName
+//                    }
+//                }
+//            }
         }
     }
 
@@ -51,16 +67,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    compileOnly 'com.android.tools.build:gradle:3.0.1'
 
     //引入aspectj的依赖
-    api 'org.aspectj:aspectjrt:1.9.5'
+//    api 'org.aspectj:aspectjrt:1.9.5'
 }
-repositories {
-    mavenCentral()
-}
+

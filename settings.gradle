@@ -1,6 +1,52 @@
-rootProject.name='GradleNew'
-include ':apps:app',':apps:appb',':apps:appa'
+rootProject.name = 'GradleNew'
+include ':apps:app', ':apps:appb', ':apps:appa'
 include ':libraryA'
 include ':libraryb'
 include ':libraryc'
 //include ':buildSrc'
+
+//导入工程的module
+//if (userSpeechModule){
+//    include 'speech'
+//    project(":speech").projectDir=new File('modelu地址')
+//}
+
+gradle.addBuildListener(new BuildListener() {
+    @Override
+    void buildStarted(Gradle gradle) {
+        //开始构建
+        println "buildStarted---->${gradle.toString()}"
+    }
+
+    @Override
+    void settingsEvaluated(Settings settings) {
+        //setting.gradle 中代码执行完毕
+        println "settingsEvaluated---->${settings.toString()}"
+//        file( "../gradleNew/outputs").deleteDir()//在子线程执行，可能会很久之后才执行
+//        def appsChildProject = project.getChildProjects().get('apps').getAllprojects()
+//        for (apps in appsChildProject) {
+//            if (apps.name != "apps") {
+//                println "----->>" + apps.getProjectDir().getAbsolutePath() + "/build"
+//                file(apps.getProjectDir().getAbsolutePath() + "/build").deleteDir()
+//            }
+//        }
+    }
+
+    @Override
+    void projectsLoaded(Gradle gradle) {
+        //项目结构加载完成（初始化阶段结束）
+        println "projectsLoaded---->${gradle.gradle.rootProject}"
+    }
+
+    @Override
+    void projectsEvaluated(Gradle gradle) {
+        //所有项目评估完成（配置阶段结束）
+        println "projectsEvaluated---->${gradle.gradle.rootProject}"
+    }
+
+    @Override
+    void buildFinished(BuildResult result) {
+        //构建结束
+        println "buildFinished---->${result.gradle.rootProject}"
+    }
+})
